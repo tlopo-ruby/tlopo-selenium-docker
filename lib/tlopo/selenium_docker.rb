@@ -29,8 +29,15 @@ module Tlopo
       start
       yield driver
     ensure
-      driver.quit
+      best_effort { driver.quit }
       stop
+    end
+
+    def best_effort
+      begin
+        yield
+      rescue
+      end
     end
 
     def gen_short_id
