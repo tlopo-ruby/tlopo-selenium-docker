@@ -36,10 +36,9 @@ module Tlopo
     end
 
     def best_effort
-      begin
-        yield
-      rescue
-      end
+      yield
+    rescue StandardError
+      nil
     end
 
     def gen_short_id

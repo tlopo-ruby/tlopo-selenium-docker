@@ -15,7 +15,7 @@ module Tlopo
     PAGE_DWELL_SECONDS = 1
     PAGE_TITLE = "Dummy Server"
     MARKER_TEXT = "hello from dummy"
-    PAGE_BODY = <<~HTML
+    PAGE_BODY = <<~HTML.freeze
       <!DOCTYPE html>
       <html>
         <head><title>#{PAGE_TITLE}</title></head>
