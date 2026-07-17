@@ -1,39 +1,100 @@
-# Tlopo::Selenium::Docker
+# Tlopo::SeleniumDocker
 
-TODO: Delete this and the text below, and describe your gem
+Manages the lifecycle of a Selenium Docker container and hands you a ready-to-use
+`Selenium::WebDriver`. It pulls the images, allocates free host ports (guarded by file
+locks so parallel runs don't collide), creates a dedicated Docker network, starts the
+browser container, and optionally records a video of the session. Everything is torn
+down when the block returns.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/tlopo/selenium/docker`. To experiment with that code, run `bin/console` for an interactive prompt.
+## Requirements
+
+- A running Docker daemon reachable by [`docker-api`](https://github.com/swipely/docker-api)
+- Ruby >= 2.6.0
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add the gem to your Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
+```ruby
+gem "tlopo-selenium-docker"
+```
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+Then run:
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+    $ bundle install
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+Or install it directly:
+
+    $ gem install tlopo-selenium-docker
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+require "tlopo/selenium_docker"
+
+Tlopo::SeleniumDocker.new.run do |driver|
+  driver.navigate.to "https://example.com"
+  puts driver.title
+end
+```
+
+### Options
+
+| Option             | Default                                    | Description                                          |
+| ------------------ | ------------------------------------------ | ---------------------------------------------------- |
+| `:selenium_image`  | `selenium/standalone-chrome:4.8.3`         | Image used for the browser container.                |
+| `:video_image`     | `selenium/video:ffmpeg-4.3.1-20220726`     | Image used for the video recorder.                   |
+| `:chrome_data_dir` | `nil`                                      | Host directory mounted as the Chrome user data dir.  |
+| `:video_path`      | `nil`                                      | When set, records the session and copies it here.    |
+
+### Recording a video
+
+```ruby
+Tlopo::SeleniumDocker.new(video_path: "session.mp4").run do |driver|
+  driver.navigate.to "https://example.com"
+end
+```
+
+The recording is written to `session.mp4` (the `.mp4` extension is appended if omitted)
+once the block completes.
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+After checking out the repo, run `bin/setup` to install dependencies. Then run
+`rake test` to run the tests, or `bin/console` for an interactive prompt.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`.
+
+### Tests
+
+There are two suites:
+
+- `rake test` — fast unit tests that do not require Docker. This is the default
+  task (`rake`) and what CI runs.
+- `rake integration` — an end-to-end test that starts a real Selenium container
+  against an in-process dummy HTTP server and records the session to video. It
+  requires a running Docker daemon and is skipped automatically when none is
+  reachable.
+
+The integration test resolves the daemon from the active Docker context (the
+same one the `docker` CLI uses), so it works with Docker Desktop, Colima, and
+others without extra configuration. Set `DOCKER_HOST` to override.
+
+It uses the multi-arch `selenium/standalone-chromium` and `selenium/video`
+images, so it runs natively on both amd64 and arm64 (Apple Silicon) hosts. The
+recording is written to `/tmp/tlopo-selenium-docker-session.mp4`:
+
+```
+$ bundle exec rake integration
+$ open /tmp/tlopo-selenium-docker-session.mp4
+```
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/tlopo-selenium-docker. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/tlopo-selenium-docker/blob/main/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/tlopo-ruby/tlopo-selenium-docker.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
-
-## Code of Conduct
-
-Everyone interacting in the Tlopo::Selenium::Docker project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/tlopo-selenium-docker/blob/main/CODE_OF_CONDUCT.md).
+The gem is available as open source under the terms of the
+[MIT License](https://opensource.org/licenses/MIT).
