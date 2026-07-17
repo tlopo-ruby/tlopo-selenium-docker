@@ -1,7 +1,12 @@
 PATH
   remote: .
   specs:
-    tlopo-selenium-docker (0.1.0)
+    tlopo-selenium-docker (0.1.2)
+      docker-api (~> 2.3.0)
+      selenium-webdriver (~> 4.25.0)
+      timeout (~> 0.4.1)
+      tlopo-futex (~> 0.1.0)
+      zlib (~> 3.1.0)
 
 GEM
   remote: https://rubygems.org/

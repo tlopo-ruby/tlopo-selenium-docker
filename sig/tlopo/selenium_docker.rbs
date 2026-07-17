@@ -1,0 +1,13 @@
+module Tlopo
+  class SeleniumDocker
+    VERSION: String
+
+    def initialize: (?Hash[Symbol, untyped] opts) -> void
+    def run: () { (untyped driver) -> untyped } -> untyped
+    def start: () -> void
+    def stop: () -> void
+    def driver: () -> untyped
+    def find_free_port: (Integer from, Integer to) -> Integer
+    def gen_short_id: () -> String
+  end
+end
