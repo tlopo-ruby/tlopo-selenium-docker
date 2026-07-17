@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "Manges Selenium Docker container lifecycle and provides a handle to Selenium driver"
   spec.homepage = "https://github.com/tlopo-ruby/tlopo-selenium-docker"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 2.6.0"
+  spec.required_ruby_version = ">= 3.3.0"
 
   spec.metadata["homepage_uri"] = spec.homepage
 
